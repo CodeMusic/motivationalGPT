@@ -303,12 +303,13 @@ class GPT(nn.Module):
         return mfu
 
     @torch.no_grad()
-    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
+    def generate(self, idx, max_new_tokens, decode, temperature=1.0, top_k=None, stopIdx=None):
         """
         Take a conditioning sequence of indices idx (LongTensor of shape (b,t)) and complete
         the sequence max_new_tokens times, feeding the predictions back into the model each time.
         Most likely you'll want to make sure to be in model.eval() mode of operation for this.
         """
+        started = False
         for _ in range(max_new_tokens):
             # if the sequence context is growing too long we must crop it at block_size
             idx_cond = idx if idx.size(1) <= self.config.block_size else idx[:, -self.config.block_size:]
@@ -326,5 +327,15 @@ class GPT(nn.Module):
             idx_next = torch.multinomial(probs, num_samples=1)
             # append sampled index to the running sequence and continue
             idx = torch.cat((idx, idx_next), dim=1)
+            out = decode(idx_next[0].tolist())#.lower()
+            
+            if (started != True and out == ' '):
+                out = ''
+            else:
+                started = True
 
+            print(out, end='', flush=True)
+            if stopIdx is not None and idx_next == stopIdx:
+                break
+            
         return idx
