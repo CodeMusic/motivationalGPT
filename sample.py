@@ -1,3 +1,5 @@
+import random
+
 prompt = "."
 
 
@@ -29,9 +31,9 @@ def main():
 
     prompt = "."
     start = prompt # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
-    num_samples = 1 # number of samples to draw
-    max_new_tokens = 500 # number of tokens generated in each sample
-    temperature = 1.0 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
+    num_samples = 199 # number of samples to draw
+    max_new_tokens = 100 # number of tokens generated in each sample
+    temperature = 0.01 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
     top_k = 300 # retain only the top_k most likely tokens, clamp others to have 0 probability
     #seed = 1337
     device = 'mps' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
@@ -99,16 +101,43 @@ def main():
     stopIdx = encode('.')[0]
     print('\n---------------\n')
 
+    temperature = 0.05
+    tempIncrement = 0.05
+    incrementTemp = True
+    randomTemp = False
     # run generation
     with torch.no_grad():
         with ctx:
             for k in range(num_samples):
+
+                if (randomTemp):
+                    temperature = random.uniform(0.01, 0.9)
+                    if (random.randint(0, 100) == 50):
+                        temperature = 3
+                    elif (random.randint(0, 100) < 50):
+                        temperature = random.uniform(0.01, 0.9)
+                    else:
+                        temperature = random.uniform(1.0, 2.0)
+                
+                if (incrementTemp):
+                    temperature += tempIncrement
+                    if (temperature > 2.48):
+                        tempIncrement = -0.05
+                    elif (temperature < 0.05):
+                        tempIncrement = 0.05
+
+
+                #temperature = round(temperature, 2)
+
+                
                 y = model.generate(x, max_new_tokens, decode=decode, temperature=temperature, top_k=top_k, stopIdx=stopIdx)
                 out = decode(y[0].tolist()).replace('\n', '').replace('.', '') + '.'
+                thoughtVariabilityText = f"Thought Variability: {temperature:.2f}"
+                print(f"                   {thoughtVariabilityText}")
                 #print(out.strip())
                 #print('\n')
     
-    return out
+    return f"{out}\n\n{thoughtVariabilityText}"
 
 
 if __name__ == "__main__":
