@@ -315,6 +315,17 @@ if __name__ == '__main__':
                     print(f"saving checkpoint to {out_dir}")
                     torch.save(checkpoint, os.path.join(out_dir, 'ckpt.pt'))
 
+                    #stats => move to helpers
+                    print("~~~~~~~~~-~~~~~~~~~~~\n");
+                    cognitiveDescrepancies = estimate_loss()
+                    years, months = convertIterationsToYearsMonths(iter_num)
+                    print(f"\nCodeMusAI, estimated age: {years} years and {months} months \ncognitive training discrepancy: {cognitiveDescrepancies['train']:.4f}, \ncognitive validation discrepancy: {cognitiveDescrepancies['val']:.4f}\n")
+                    print("================================");
+                    print(f"====Sample Output of Model ====")
+                    callAskCodeMusai(f"You are {iter_num} cycles old, and are amazing!.")
+                    print("\n================================");
+                    print("~~~~~~~~~-~~~~~~~~~~~\n");
+
         if iter_num == 0 and eval_only:
             break
 
