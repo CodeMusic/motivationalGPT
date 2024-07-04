@@ -31,10 +31,10 @@ def main():
 
     prompt = "."
     start = prompt # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
-    num_samples = 199 # number of samples to draw
+    num_samples = 1 # number of samples to draw
     max_new_tokens = 100 # number of tokens generated in each sample
-    temperature = 0.01 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
-    top_k = 300 # retain only the top_k most likely tokens, clamp others to have 0 probability
+    temperature = 1.19 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
+    top_k = 327 # retain only the top_k most likely tokens, clamp others to have 0 probability
     #seed = 1337
     device = 'mps' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
     dtype = 'bfloat16' if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else 'float16' # 'float32' or 'bfloat16' or 'float16'
@@ -101,7 +101,6 @@ def main():
     stopIdx = encode('.')[0]
     print('\n---------------\n')
 
-    temperature = 0.05
     tempIncrement = 0.05
     incrementTemp = True
     randomTemp = False
